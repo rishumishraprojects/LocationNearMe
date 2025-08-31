@@ -4,10 +4,8 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Load the API key securely from an environment variable
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 
-# Stop the server from starting if the API key isn't found
 if not API_KEY:
     raise ValueError("No GOOGLE_API_KEY set. Please set the environment variable.")
 
@@ -46,7 +44,6 @@ def get_nearby_places():
             }
         }
         
-        # --- CHANGE 1: ADD 'places.photos' TO THE FIELDMASK ---
         headers = {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': API_KEY,
@@ -61,10 +58,8 @@ def get_nearby_places():
         if 'places' in api_response:
             for place in api_response['places']:
                 photo_url = None
-                # --- CHANGE 2: CONSTRUCT THE PHOTO URL ---
                 if 'photos' in place and len(place['photos']) > 0:
                     photo_name = place['photos'][0]['name']
-                    # Construct the full URL for the photo
                     photo_url = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=200&key={API_KEY}"
 
                 places.append({
@@ -72,7 +67,7 @@ def get_nearby_places():
                     'address': place.get('formattedAddress'),
                     'rating': place.get('rating'),
                     'user_rating_count': place.get('userRatingCount'),
-                    'photo_url': photo_url  # Add the new photo URL field
+                    'photo_url': photo_url 
                 })
 
         return jsonify(places)
@@ -84,4 +79,5 @@ def get_nearby_places():
 
 
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=5000)
